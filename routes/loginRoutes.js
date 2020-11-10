@@ -3,13 +3,26 @@ const app = express.Router()
 const db = require('../controller/dbController')
 const jwt = require('jsonwebtoken')
 const routeErrorHandler = require('../middleware/errorMiddleware')
+const { checkPassword } = require('../helper/bcryptHelper')
 const secret = 'ini kode rahasia saya'
 
 app.post('/login', (req, res, next) => {
-  db.get('users', req.body)
-    .then(result => {
-      if (result.length) {
-        const user = result[0]
+  const username = req.body.username
+  const password = req.body.password
+  let user;
+  db.get('users', { username })
+
+    .then(getUserResult => {
+      if (getUserResult.length) {
+        user = getUserResult[0]
+        return checkPassword(password, user.password)
+      } else {
+        res.status(401).send('Unauthorized')
+      }
+    })
+
+    .then(checkPasswordResult => {
+      if (checkPasswordResult) {
         const token = jwt.sign(user, secret, {
           expiresIn: '6h'
         })

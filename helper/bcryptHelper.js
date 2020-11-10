@@ -2,7 +2,7 @@ const bcrypt = require('bcrypt');
 const saltRounds = 2;
 
 function salt(password) {
-    return new Promise((reject, resolve) => {
+    return new Promise((resolve, reject) => {
         bcrypt.hash(password, saltRounds, function (err, hash) {
             if (err)
                 reject(err)
@@ -13,7 +13,7 @@ function salt(password) {
 }
 
 function checkPassword(password, hash) {
-    new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
         bcrypt.compare(password, hash, function (err, result) {
             if (err)
                 reject(err)
